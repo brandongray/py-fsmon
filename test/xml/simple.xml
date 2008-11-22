@@ -1,0 +1,25 @@
+<start>
+	<default>
+		<warn>80</warn>
+		<warn_action>echo "warn default!"</warn_action>
+		<warn_clear>echo "warn default clear!"</warn_clear>
+		<critical>85</critical>
+		<critical_action>echo "critical default!"</critical_action>
+		<critical_clear>echo "critical default clear!"</critical_clear>
+		<fatal>90</fatal>
+		<fatal_action>echo "fatal default!"</fatal_action>
+		<fatal_clear>echo "fatal default clear!"</fatal_clear>
+	</default>
+	
+	<filesystem mount="/">
+		<warn>85</warn>
+		<warn_action>echo "warn defined!"</warn_action>
+		<warn_clear>echo "warn defined clear!"</warn_clear>
+		<critical>90</critical>
+		<critical_action>echo "critical defined!"</critical_action>
+		<critical_clear>echo "critical defined clear!"</critical_clear>
+		<fatal>95</fatal>
+		<fatal_action>echo "fatal defined!"</fatal_action>
+		<fatal_clear>echo "fatal defined clear!"</fatal_clear>
+	</filesystem>
+</start>
