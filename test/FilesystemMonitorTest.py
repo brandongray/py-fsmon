@@ -5,13 +5,18 @@ import re
 import xml.sax
 
 class FilesystemTest(unittest.TestCase):
-	def test_PercentUsedCommon(self):
+	def test_getPercentUsed(self):
 		a = FilesystemMonitor.Filesystem("/tmp", 1, 9)
 		self.assertEquals(10, a.percentUsed)
-	
-	def test_PerentUsedZero(self):
-		a = FilesystemMonitor.Filesystem("/tmp", 0, 9)
-		self.assertEquals(0, a.percentUsed)
+		b = FilesystemMonitor.Filesystem("/tmp", 0, 100)
+		self.assertEquals(0, b.percentUsed)
+		c = FilesystemMonitor.Filesystem("/tmp", 100, 0)
+		self.assertEquals(100, c.percentUsed)
+
+	def test_setSpaceUsed(self):
+		a = FilesystemMonitor.Filesystem("/tmp", 5, 5)
+		a.setSpaceUsed(1, 9)
+		self.assertEquals(10, a.percentUsed)
 	
 	def test_toXML(self):
 		a = FilesystemMonitor.Filesystem("/tmp", 1, 9)
@@ -20,11 +25,6 @@ class FilesystemTest(unittest.TestCase):
 <kFree>9</kFree>\n\
 <PercentUsed>10.0</PercentUsed>\n"
 		self.assertEquals(b, a.toXML())
-
-	def test_setSpaceUsed(self):
-		a = FilesystemMonitor.Filesystem("/tmp", 5, 5)
-		a.setSpaceUsed(1, 9)
-		self.assertEquals(10, a.percentUsed)
 
 class FilesystemManagerTest(unittest.TestCase):
 	def test_checkWarningBelow(self):
@@ -128,6 +128,7 @@ class FilesystemMonitorTest(unittest.TestCase):
 	def test_getFilesystemLayout(self):
 		a = FilesystemMonitor.FilesystemMonitor()
 		a.getFilesystemLayout()
+		# MacOSX specific (change soon)
 		self.assertEquals("hfs", a.layout["/"])
 
 	def test_initializeFilesystemManagersContainsRoot(self):
