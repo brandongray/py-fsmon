@@ -139,7 +139,7 @@ class FilesystemMonitorTest(unittest.TestCase):
 		a = FilesystemMonitor.FilesystemMonitor()
 		a.initializeFilesystemManagers()
 		fm = a.filesystemManagers["/"]
-		self.assertEquals(90, fm.warning)
+		self.assertEquals(90, fm.warn)
 
 	def test_checkFilesystemThresholds(self):
 		a = FilesystemMonitor.FilesystemMonitor()
@@ -175,7 +175,7 @@ class FilesystemMonitorTest(unittest.TestCase):
 		a.processConfigurationFile("./xml/simple.xml")
 		# Put code here...
 		fm = a.filesystemManagers["/"]
-		self.assertEquals(85, fm.warning)
+		self.assertEquals(85, fm.warn)
 
 	def test_processConfigurationFileMalformedXML(self):
 		a = FilesystemMonitor.FilesystemMonitor()
@@ -184,130 +184,34 @@ class FilesystemMonitorTest(unittest.TestCase):
 class ConfigHandlerTest(unittest.TestCase):
 	"""The tests below are all related to XML parsing"""
 
-	def test_DefaultWarningThreshold(self):
+	def test_DefaultThresholds(self):
 		parser = xml.sax.make_parser()
 		handler = FilesystemMonitor.ConfigHandler()
 		parser.setContentHandler(handler)
 		parser.parse("./xml/simple.xml")
 		self.assertEquals(80, handler.mapping["default"]["warn"])
-
-	def test_DefaultCriticalThreshold(self):
-		parser = xml.sax.make_parser()
-		handler = FilesystemMonitor.ConfigHandler()
-		parser.setContentHandler(handler)
-		parser.parse("./xml/simple.xml")
 		self.assertEquals(85, handler.mapping["default"]["critical"])
-
-	def test_DefaultFatalThreshold(self):
-		parser = xml.sax.make_parser()
-		handler = FilesystemMonitor.ConfigHandler()
-		parser.setContentHandler(handler)
-		parser.parse("./xml/simple.xml")
 		self.assertEquals(90, handler.mapping["default"]["fatal"])
-
-	def test_DefaultWarningActionThreshold(self):
-		parser = xml.sax.make_parser()
-		handler = FilesystemMonitor.ConfigHandler()
-		parser.setContentHandler(handler)
-		parser.parse("./xml/simple.xml")
 		self.assertEquals("echo \"warn default!\"", handler.mapping["default"]["warn_action"])
-
-	def test_DefaultCriticalActionThreshold(self):
-		parser = xml.sax.make_parser()
-		handler = FilesystemMonitor.ConfigHandler()
-		parser.setContentHandler(handler)
-		parser.parse("./xml/simple.xml")
 		self.assertEquals("echo \"critical default!\"", handler.mapping["default"]["critical_action"])
-
-	def test_DefaultFatalActionThreshold(self):
-		parser = xml.sax.make_parser()
-		handler = FilesystemMonitor.ConfigHandler()
-		parser.setContentHandler(handler)
-		parser.parse("./xml/simple.xml")
 		self.assertEquals("echo \"fatal default!\"", handler.mapping["default"]["fatal_action"])
-
-	def test_DefaultWarningActionClearThreshold(self):
-		parser = xml.sax.make_parser()
-		handler = FilesystemMonitor.ConfigHandler()
-		parser.setContentHandler(handler)
-		parser.parse("./xml/simple.xml")
 		self.assertEquals("echo \"warn default clear!\"", handler.mapping["default"]["warn_clear"])
-
-	def test_DefaultCriticalActionClearThreshold(self):
-		parser = xml.sax.make_parser()
-		handler = FilesystemMonitor.ConfigHandler()
-		parser.setContentHandler(handler)
-		parser.parse("./xml/simple.xml")
 		self.assertEquals("echo \"critical default clear!\"", handler.mapping["default"]["critical_clear"])
-
-	def test_DefaultFatalActionClearThreshold(self):
-		parser = xml.sax.make_parser()
-		handler = FilesystemMonitor.ConfigHandler()
-		parser.setContentHandler(handler)
-		parser.parse("./xml/simple.xml")
 		self.assertEquals("echo \"fatal default clear!\"", handler.mapping["default"]["fatal_clear"])
 
-	def test_DefinedWarningThreshold(self):
+	def test_DefinedThresholds(self):
 		parser = xml.sax.make_parser()
 		handler = FilesystemMonitor.ConfigHandler()
 		parser.setContentHandler(handler)
 		parser.parse("./xml/simple.xml")
 		self.assertEquals(85, handler.mapping["/"]["warn"])
-
-	def test_DefaultDefinedThreshold(self):
-		parser = xml.sax.make_parser()
-		handler = FilesystemMonitor.ConfigHandler()
-		parser.setContentHandler(handler)
-		parser.parse("./xml/simple.xml")
 		self.assertEquals(90, handler.mapping["/"]["critical"])
-
-	def test_DefinedFatalThreshold(self):
-		parser = xml.sax.make_parser()
-		handler = FilesystemMonitor.ConfigHandler()
-		parser.setContentHandler(handler)
-		parser.parse("./xml/simple.xml")
 		self.assertEquals(95, handler.mapping["/"]["fatal"])
-
-	def test_DefinedWarningActionThreshold(self):
-		parser = xml.sax.make_parser()
-		handler = FilesystemMonitor.ConfigHandler()
-		parser.setContentHandler(handler)
-		parser.parse("./xml/simple.xml")
 		self.assertEquals("echo \"warn defined!\"", handler.mapping["/"]["warn_action"])
-
-	def test_DefinedCriticalActionThreshold(self):
-		parser = xml.sax.make_parser()
-		handler = FilesystemMonitor.ConfigHandler()
-		parser.setContentHandler(handler)
-		parser.parse("./xml/simple.xml")
 		self.assertEquals("echo \"critical defined!\"", handler.mapping["/"]["critical_action"])
-
-	def test_DefinedFatalActionThreshold(self):
-		parser = xml.sax.make_parser()
-		handler = FilesystemMonitor.ConfigHandler()
-		parser.setContentHandler(handler)
-		parser.parse("./xml/simple.xml")
 		self.assertEquals("echo \"fatal defined!\"", handler.mapping["/"]["fatal_action"])
-
-	def test_DefinedWarningActionClearThreshold(self):
-		parser = xml.sax.make_parser()
-		handler = FilesystemMonitor.ConfigHandler()
-		parser.setContentHandler(handler)
-		parser.parse("./xml/simple.xml")
 		self.assertEquals("echo \"warn defined clear!\"", handler.mapping["/"]["warn_clear"])
-
-	def test_DefinedCriticalActionClearThreshold(self):
-		parser = xml.sax.make_parser()
-		handler = FilesystemMonitor.ConfigHandler()
-		parser.setContentHandler(handler)
-		parser.parse("./xml/simple.xml")
 		self.assertEquals("echo \"critical defined clear!\"", handler.mapping["/"]["critical_clear"])
-
-	def test_DefinedFatalActionClearThreshold(self):
-		parser = xml.sax.make_parser()
-		handler = FilesystemMonitor.ConfigHandler()
-		parser.setContentHandler(handler)
-		parser.parse("./xml/simple.xml")
 		self.assertEquals("echo \"fatal defined clear!\"", handler.mapping["/"]["fatal_clear"])
 
 	def test_malformedXML(self):
@@ -315,6 +219,19 @@ class ConfigHandlerTest(unittest.TestCase):
 		handler = FilesystemMonitor.ConfigHandler()
 		parser.setContentHandler(handler)
 		self.assertRaises(xml.sax.SAXParseException, parser.parse, "./xml/simple-mal.xml")
+
+	def test_DefinedFatalActionClearThresholdMinDefault(self):
+		fsmon = FilesystemMonitor.FilesystemMonitor()
+		fsmon.processConfigurationFile("./xml/simple-min.xml")
+		fm = fsmon.filesystemManagers["/"]
+		self.assertEquals("echo \"critical default!\"", fm.critical_action)
+
+	def test_DefinedFatalActionClearThresholdMinDefined(self):
+		fsmon = FilesystemMonitor.FilesystemMonitor()
+		fsmon.processConfigurationFile("./xml/simple-min.xml")
+		fm = fsmon.filesystemManagers["/"]
+		self.assertEquals(91, fm.fatal)
+
 
 if __name__ == '__main__':
 	if sys.platform != "darwin":

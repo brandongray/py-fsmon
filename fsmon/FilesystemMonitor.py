@@ -9,6 +9,7 @@ import sys
 import time
 import xml.sax.handler
 import re
+import getopt
 
 class Filesystem(object):
 	"""This class defines the 'basic' filesystem properties"""
@@ -35,7 +36,7 @@ class FilesystemManager(object):
 
 	def __init__(self,filesystem):
 		self.filesystem = filesystem
-		self.warning = 90
+		self.warn = 90
 		self.warn_action = "none"
 		self.warn_clear = "none"
 		self.aboveWarning = False
@@ -50,7 +51,7 @@ class FilesystemManager(object):
 
 	def checkWarning(self):
 		"""Checks to see if percent is above warning threshold"""
-		if self.filesystem.percentUsed >= self.warning:
+		if self.filesystem.percentUsed >= self.warn:
 			if self.aboveWarning != True:
 				# Execute warning threshold!
 				if self.warn_action != "none":
@@ -104,7 +105,7 @@ class FilesystemManager(object):
 
 	def toXML(self):
 		return self.filesystem.toXML() + "\
-<WarningThreshold>" + str(self.warning) + "</WarningThreshold>\n\
+<WarningThreshold>" + str(self.warn) + "</WarningThreshold>\n\
 <WarningThresholdAction>" + str(self.warn_action) + "</WarningThresholdAction>\n\
 <WarningThresholdClearAction>" + str(self.warn_clear) + "</WarningThresholdClearAction>\n\
 <CriticalThreshold>" + str(self.critical) + "</CriticalThreshold>\n\
@@ -207,20 +208,18 @@ class FilesystemMonitor(object):
 		parser.setContentHandler(handler)
 		# Throws xml.sax.SAXParseException
 		parser.parse(filename)
-		handler.mapping
+
 		for mount in self.filesystemManagers:
+			fm = self.filesystemManagers[mount]
+			if handler.mapping.has_key("default"):
+				for key in handler.mapping["default"]:
+					setattr(fm, key, handler.mapping["default"][key])
 			if handler.mapping.has_key(mount):
-				fm = self.filesystemManagers[mount]
-				fm.warning = handler.mapping[mount]["warn"]
-				fm.critical = handler.mapping[mount]["critical"]
-				fm.fatal = handler.mapping[mount]["fatal"]
-			elif handler.mapping.has_key("default"):
-				fm = self.filesystemManagers[mount]
-				fm.warning = handler.mapping["default"]["warn"]
-				fm.critical = handler.mapping["default"]["critical"]
-				fm.fatal = handler.mapping["default"]["fatal"]
+				for key in handler.mapping[mount]:
+					setattr(fm, key, handler.mapping[mount][key])
 
 class ConfigHandler(xml.sax.handler.ContentHandler):
+		"""Content handler for XML parsing"""
 		def __init__(self):
 			self.mapping = {}
 			self.title = ""
@@ -239,17 +238,45 @@ class ConfigHandler(xml.sax.handler.ContentHandler):
 			self.buffer += data
 
 		def endElement(self, name):
-			if re.search("^(warn)|(critical)|(fatal)", name):
+			if re.search("^((warn)|(critical)|(fatal))(_action)?(_clear)?$", name):
 				if re.match("^\d+$", self.buffer):
 					self.mapping[self.title][name] = int(self.buffer)
 				else:
 					self.mapping[self.title][name] = self.buffer
 
-if __name__ == '__main__':
+def main(argv):
 	if sys.platform != "darwin":
 		print "The platform " + sys.platform + " is not yet implemented!"
 		sys.exit(1)
 	else:
-		a = FilesystemMonitor()
-		# Need to add command line options for xml configuration file
-		a.run(file="../test/xml/simple.xml")
+		try:
+			opts, args = getopt.getopt(argv, "hc:", ["help", "config="])
+		except getopt.GetoptError, err:
+			usage()
+			sys.exit(2)
+
+		config = "none"
+
+		for o, a in opts:
+			if o in ("-h", "--help"):
+				usage()
+				sys.exit(1)
+			elif o in ("-c", "--config"):
+				config = a
+
+		if config == "none":
+			usage()
+			sys.exit(1)
+		else:
+			mon = FilesystemMonitor()
+			try:
+				mon.run(file=config)
+			except xml.sax.SAXParseException:
+				print "Problem parsing XML configuration file"
+				sys.exit(1)
+
+def usage():
+	print "Usage : FilesystemMonitor.py --config=<path_to_config>"
+
+if __name__ == '__main__':
+		main(sys.argv[1:])
