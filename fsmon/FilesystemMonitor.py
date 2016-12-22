@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """FilesystemMonitor
-Written by : Brandon Gray (bgray@ossenabled.com)
+Written by : Brandon Gray (graybrandon@gmail.com)
 Details : Monitors filesystem size"""
 
 from __future__ import division
